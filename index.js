@@ -76,15 +76,14 @@ const makeMATCH_INFO_PLAYER_WEAPON_LOADOUT = (weaponLoadoutArr) => {
 }
 const MATCH_INFO_PLAYER_END_DATA  = Buffer.from([
     // ???
-    /*for host: 0x00, 
-    0x00, 0x00, 0x01, 0x01,
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,*/
+    /*for host:
+    00 00 00 01
+    00 00 00 00 
+    00 00 00 00 00,*/
     // for normal player on ready state:
-    0x00, 
-    0x00, 0x00, 0x06, 0x00,
-    0x01, 0x00, 0x00, 0x00, 
-    0x02, 0x00, 0x00, 0x00,
+    00, 00, 07, 01,
+    00, 00, 00, 00, 
+    01, 00, 00, 00
 ])
 
 const MATCH_INFO_EMPTY_PLAYER = Buffer.alloc(56);
@@ -110,8 +109,7 @@ const C2S_S2C_PING = Buffer.from([0x3a, 0x19]);
 const name = `<button>muahaha</button>`
 const map = `maps/igloos.map`
 let players = [
-    // makeMATCH_INFO_PLAYER("Amadeus", PLAYER_DEFAULT_WEAPON_LOADOUT, [0xff, 0x00, 0x00]),
-    MATCH_INFO_EMPTY_PLAYER,
+    makeMATCH_INFO_PLAYER("Amadeus", PLAYER_DEFAULT_WEAPON_LOADOUT, [0x00, 0x00, 0xff, 0x00]),
     MATCH_INFO_EMPTY_PLAYER,
     MATCH_INFO_EMPTY_PLAYER,
     MATCH_INFO_EMPTY_PLAYER,
@@ -156,9 +154,9 @@ socket.on('message', function (message, remote) {
         let playerInfo = message.subarray(C2S_SEND_PLAYER_INFO_HEADER.length);
         let playerName = playerInfo.subarray(0, 16);
         let playerLoadout = Array.from(playerInfo.subarray(16, 16 + 6 * 4).filter((_, i) => (i % 4) === 0));
-        let playerColor = playerInfo.subarray(16 + 6 * 4, 16 + 6 * 4 + 3);
+        let playerColor = playerInfo.subarray(16 + 6 * 4, 16 + 6 * 4 + 4);
         console.log(`-- C2S_SEND_PLAYER_INFO_HEADER, name: ${playerName}, loadout: ${playerLoadout}, color: ${hex(playerColor)}`)
-        // players[5] = makeMATCH_INFO_PLAYER(playerName, playerLoadout, playerColor);
+        players[1] = makeMATCH_INFO_PLAYER(playerName, playerLoadout, playerColor);
         seqMap["1f" + remote.address] = ((seqMap["1f" + remote.address]) ?? 1) + 1;
         console.log(seqMap["1f" + remote.address])
         return reply(remote, matchInfo(seqMap["1f" + remote.address]));
