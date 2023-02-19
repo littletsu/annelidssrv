@@ -29,12 +29,12 @@ const strWithPadding = (str, pad=32) => Buffer.from(str.toString().padEnd(pad, '
 const makeSEND_GAME = (matchName) => Buffer.concat([SEND_GAME_HEADER, strWithPadding(matchName)])
 const isMsg = (a, b) => Buffer.compare(a, b) === 0
 const hasHeader = (msg, header) => isMsg(msg.subarray(0, header.length), header)
-let matchSeq = 2;
-const MATCH_INFO_HEADER = () => {
+
+const MATCH_INFO_HEADER = (seq) => {
     let h = Buffer.from([
     // 6 byte message type/header  
     0x3a, 0x1e, 
-    matchSeq, 0x00, 0x00, 0x00, 
+    seq, 0x00, 0x00, 0x00, 
     
     // Data Header ??
     0x3a, 0x01,
@@ -43,7 +43,6 @@ const MATCH_INFO_HEADER = () => {
     // Match data ??
     // Player list ??
     ])
-    matchSeq++;
     return h;
 }
 const MATCH_INFO_MATCH_DATA = Buffer.from([
@@ -53,9 +52,9 @@ const MATCH_INFO_MATCH_DATA = Buffer.from([
 
     0x00, 0x00, 
 ])
-const makeMATCH_INFO = (matchName, mapFile, playerList) =>
+const makeMATCH_INFO = (matchName, mapFile, playerList, seq) =>
     Buffer.concat([
-        MATCH_INFO_HEADER(), 
+        MATCH_INFO_HEADER(seq), 
         strWithPadding(matchName), 
         strWithPadding(mapFile), 
         MATCH_INFO_MATCH_DATA, 
@@ -119,7 +118,7 @@ let players = [
     MATCH_INFO_EMPTY_PLAYER,
     MATCH_INFO_EMPTY_PLAYER,
 ]
-const matchInfo = () => makeMATCH_INFO(name, map, players)
+const matchInfo = (seq) => makeMATCH_INFO(name, map, players, seq)
 const sendGame = makeSEND_GAME(name)
 const reply = (remote, msg, cb) => socket.send(msg, remote.port, remote.address, cb)
 const chainReply = (remote, msgs) => {
@@ -129,6 +128,7 @@ const chainReply = (remote, msgs) => {
     })
 }
 const hex = (str) => str.toString("hex").match(/.{1,2}/g).join(' ')
+let seqMap = {};
 socket.on('message', function (message, remote) {
 	console.log(`(size ${remote.size}) ${hex(message)} from ${remote.address}:${remote.port} (${(new Date()).toLocaleTimeString()})`)
     
@@ -142,7 +142,8 @@ socket.on('message', function (message, remote) {
     }
     if(isMsg(message, C2S_MATCH_INFO_REQUEST)) {
         console.log(`-- C2S_MATCH_INFO_REQUEST, sending ${matchInfo.length} bytes back`)
-        return reply(remote, matchInfo());
+        seqMap["1f" + remote.address] = ((seqMap["1f" + remote.address]) ?? 1) + 1;
+        return reply(remote, matchInfo(seqMap["1f" + remote.address]));
     }
 
 
@@ -152,14 +153,15 @@ socket.on('message', function (message, remote) {
     }
 
     if(hasHeader(message, C2S_SEND_PLAYER_INFO_HEADER)) {
-        
         let playerInfo = message.subarray(C2S_SEND_PLAYER_INFO_HEADER.length);
         let playerName = playerInfo.subarray(0, 16);
         let playerLoadout = Array.from(playerInfo.subarray(16, 16 + 6 * 4).filter((_, i) => (i % 4) === 0));
         let playerColor = playerInfo.subarray(16 + 6 * 4, 16 + 6 * 4 + 3);
         console.log(`-- C2S_SEND_PLAYER_INFO_HEADER, name: ${playerName}, loadout: ${playerLoadout}, color: ${hex(playerColor)}`)
         // players[5] = makeMATCH_INFO_PLAYER(playerName, playerLoadout, playerColor);
-        return reply(remote, matchInfo());
+        seqMap["1f" + remote.address] = ((seqMap["1f" + remote.address]) ?? 1) + 1;
+        console.log(seqMap["1f" + remote.address])
+        return reply(remote, matchInfo(seqMap["1f" + remote.address]));
     }
 });
 
