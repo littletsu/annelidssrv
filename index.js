@@ -29,10 +29,12 @@ const strWithPadding = (str, pad=32) => Buffer.from(str.toString().padEnd(pad, '
 const makeSEND_GAME = (matchName) => Buffer.concat([SEND_GAME_HEADER, strWithPadding(matchName)])
 const isMsg = (a, b) => Buffer.compare(a, b) === 0
 const hasHeader = (msg, header) => isMsg(msg.subarray(0, header.length), header)
-
-const MATCH_INFO_HEADER = Buffer.from([
+let matchSeq = 2;
+const MATCH_INFO_HEADER = () => {
+    let h = Buffer.from([
     // 6 byte message type/header  
-    0x3a, 0x1e, 0x03, 0x00, 0x00, 0x00, 
+    0x3a, 0x1e, 
+    matchSeq, 0x00, 0x00, 0x00, 
     
     // Data Header ??
     0x3a, 0x01,
@@ -40,7 +42,10 @@ const MATCH_INFO_HEADER = Buffer.from([
     // 32 bytes (?) for map file
     // Match data ??
     // Player list ??
-])
+    ])
+    matchSeq++;
+    return h;
+}
 const MATCH_INFO_MATCH_DATA = Buffer.from([
     // 18 bytes for match data??
     0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -50,7 +55,7 @@ const MATCH_INFO_MATCH_DATA = Buffer.from([
 ])
 const makeMATCH_INFO = (matchName, mapFile, playerList) =>
     Buffer.concat([
-        MATCH_INFO_HEADER, 
+        MATCH_INFO_HEADER(), 
         strWithPadding(matchName), 
         strWithPadding(mapFile), 
         MATCH_INFO_MATCH_DATA, 
