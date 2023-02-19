@@ -111,7 +111,8 @@ const C2S_S2C_PING = Buffer.from([0x3a, 0x19]);
 const name = `<button>muahaha</button>`
 const map = `maps/igloos.map`
 let players = [
-    makeMATCH_INFO_PLAYER("Amadeus", PLAYER_DEFAULT_WEAPON_LOADOUT, [0xff, 0x00, 0x00]),
+    // makeMATCH_INFO_PLAYER("Amadeus", PLAYER_DEFAULT_WEAPON_LOADOUT, [0xff, 0x00, 0x00]),
+    MATCH_INFO_EMPTY_PLAYER,
     MATCH_INFO_EMPTY_PLAYER,
     MATCH_INFO_EMPTY_PLAYER,
     MATCH_INFO_EMPTY_PLAYER,
@@ -157,7 +158,7 @@ socket.on('message', function (message, remote) {
         let playerLoadout = Array.from(playerInfo.subarray(16, 16 + 6 * 4).filter((_, i) => (i % 4) === 0));
         let playerColor = playerInfo.subarray(16 + 6 * 4, 16 + 6 * 4 + 3);
         console.log(`-- C2S_SEND_PLAYER_INFO_HEADER, name: ${playerName}, loadout: ${playerLoadout}, color: ${hex(playerColor)}`)
-        players[1] = makeMATCH_INFO_PLAYER(playerName, playerLoadout, playerColor);
+        // players[5] = makeMATCH_INFO_PLAYER(playerName, playerLoadout, playerColor);
         return reply(remote, matchInfo());
     }
 });

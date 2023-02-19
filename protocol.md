@@ -215,7 +215,7 @@ Sent after `"Connection Ack"` from server, after `"Add player to the game"` or w
 ```
 
 # Add player to the game (C2S) ???
-Asks the server to add the player to the game that will be sent through a `"Send Player Info"` packet right after this packet. If it's not added and followed by a `"Match Info"` packet from the server, the client will not connect to the server.
+Asks the server to add the player to the game that will be sent through a `"Send Player Info"` packet right after this packet. If followed by a `"Match Info"` packet from the server, the client will not connect to the server.
 ```js
 [0x3a, 0x1f, 0x03, 0x00, 0x00, 0x00]
 ```
