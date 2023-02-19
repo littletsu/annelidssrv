@@ -47,10 +47,17 @@ const MATCH_INFO_HEADER = (seq) => {
 }
 const MATCH_INFO_MATCH_DATA = Buffer.from([
     // 18 bytes for match data??
-    0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00,
-
+    0x00, 
+    // Gamemode (in order displayed in gamemode change screen)
+    0x01,
+    // ?? 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    // Win condition for Kill modes (Kills) (LE 2byte Int)
+    0x0a, 0x00, 
+    // Win condition for Flag and Egg (how many eggs max) modes (LE 2byte Int)
     0x00, 0x00, 
+    // Win condition for Time modes (Hours in seconds but game takes it as minutes?) (LE 4byte Int?)
+    0x00, 0x00, 0x00, 0x00, 
 ])
 const makeMATCH_INFO = (matchName, mapFile, playerList, seq) =>
     Buffer.concat([
@@ -68,7 +75,7 @@ const MATCH_INFO_PLAYER_DEFAULT_WEAPON_LOADOUT = [
     0x07, 0x00, 0x00, 0x00,
     0x0f, 0x00, 0x00, 0x00
 ]
-const PLAYER_DEFAULT_WEAPON_LOADOUT = [0x00, 0x01, 0x02, 0x09, 0x07, 0x0f]
+const PLAYER_DEFAULT_WEAPON_LOADOUT = [16, 16, 16, 16, 16, 16]
 const makeMATCH_INFO_PLAYER_WEAPON_LOADOUT = (weaponLoadoutArr) => {
     let a = MATCH_INFO_PLAYER_DEFAULT_WEAPON_LOADOUT.slice(0);
     for(let i = 0; i < weaponLoadoutArr.length; i++) a[i * 4] = weaponLoadoutArr[i]
@@ -81,9 +88,10 @@ const MATCH_INFO_PLAYER_END_DATA  = Buffer.from([
     00 00 00 00 
     00 00 00 00 00,*/
     // for normal player on ready state:
-    00, 00, 07, 01,
-    00, 00, 00, 00, 
-    01, 00, 00, 00
+    0x00, 0x00, 0x07, 0x01,
+    0x00, 0x00, 0x00, 0x00,
+    // Can edit character? 
+    0x01, 0x00, 0x00, 0x00
 ])
 
 const MATCH_INFO_EMPTY_PLAYER = Buffer.alloc(56);
@@ -106,7 +114,7 @@ const C2S_SEND_PLAYER_INFO_HEADER = Buffer.from([
     0x3a, 0x00, 0xff, 0x00
 ])
 const C2S_S2C_PING = Buffer.from([0x3a, 0x19]);
-const name = `<button>muahaha</button>`
+const name = `<a style="color:red;">:3</a>`
 const map = `maps/igloos.map`
 let players = [
     makeMATCH_INFO_PLAYER("Amadeus", PLAYER_DEFAULT_WEAPON_LOADOUT, [0x00, 0x00, 0xff, 0x00]),
