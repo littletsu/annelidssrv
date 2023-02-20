@@ -50,7 +50,7 @@ An 8 byte packet is followed by a 12 byte packet
 ]
 ```
 
-# Connection Ack/Data Request (C2S) ?
+# Connection Ack/Data Request/Match Info Received (C2S) ?
 Sent after `"Connection Ack"` from server. Both are variants of `"Match Info Request"`.
 
 
@@ -63,8 +63,8 @@ Sent after `"Connection Ack"` from server. Both are variants of `"Match Info Req
 [0x3a, 0x1f, 0x01, 0x00, 0x00, 0x00]
 ```
 
-# Match Info Request (C2S) ?
-Asks the server to send a `"Match Info"` packet to the client
+# Match Info Request/Match Info Received (C2S) ?
+Asks the server to send a `"Match Info"` packet to the client, or is sent after a `"Match Info"` from server.
 
 ```js
 [0x3a, 0x1f, 0x01, 0x00, 0x00, 0x00]
@@ -148,15 +148,37 @@ Sent after `"Connection Ack"` from server, after `"Add player to the game"` or w
   0x0f, 0x00, 0x00, 0x00, 
   
   // -- 16 bytes for player data??
-  // Color
+  // Color (LE 4byte Int)
   0x00, 0x00, 0x32, 0x00
-  // ??? 
-  0x00, 0x00, 0x07, 0x01,
-  0x00, 0x00, 0x00, 0x00,
+
+  // ??? if all 0x00 player is not in the game?
+  0x00, 0x00, 0x07, 
+  // Player ready?? (both 0x01 for ready, any 0x00 for not ready)
+  0x01, 0x01, 
+  // ??
+  0x00, 0x00, 0x00,
   // Can edit character? 
   0x01, 
-  // ???
-  0x00, 0x00, 0x00
+  // Player type?
+  // 0x00 - You??
+  // 0x01 - not you?/host?/normal player?
+  // 0x02 - easy bot??
+  // 0x03 - medium bot??
+  // 0x04 - hard bot??
+  // 0x05 - harder bot??
+  // 0x06 - ready?
+  // 0x07 - ??? not ready?
+  0x07, 
+  // ??
+  0x00, 0x00
+
+
+
+
+
+
+
+
 
   // end player
 

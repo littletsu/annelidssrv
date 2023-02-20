@@ -87,11 +87,26 @@ const MATCH_INFO_PLAYER_END_DATA  = Buffer.from([
     00 00 00 01
     00 00 00 00 
     00 00 00 00 00,*/
-    // for normal player on ready state:
-    0x00, 0x00, 0x07, 0x01,
-    0x00, 0x00, 0x00, 0x00,
+    // ??? if all 0x00 player is not in the game?
+    0x00, 0x00, 0x06, 
+    // Player ready??
+    0x01, 0x01, 
+    // ??
+    0x00, 0x00, 0x00,
     // Can edit character? 
-    0x01, 0x00, 0x00, 0x00
+    0x01, 
+    // Player type?
+    // 0x00 - You??
+    // 0x01 - not you?/host?/normal player?
+    // 0x02 - easy bot??
+    // 0x03 - medium bot??
+    // 0x04 - hard bot??
+    // 0x05 - harder bot??
+    // 0x06 - ready?
+    // 0x07 - ??? not ready?
+    0x00, 
+    // ??
+    0x00, 0x00
 ])
 
 const MATCH_INFO_EMPTY_PLAYER = Buffer.alloc(56);
@@ -112,6 +127,11 @@ const C2S_SEND_PLAYER_INFO_HEADER = Buffer.from([
     0x3a, 0x1e, 0x00, 0x00, 0x00, 0x00,
     // Data Header ?? 
     0x3a, 0x00, 0xff, 0x00
+])
+
+const S2C_PLAYER_READY_ACK = Buffer.from([0x3a, 0x1f, 0x01, 0x00, 0x00, 0x00]);
+const C2S_PLAYER_READY = Buffer.from([
+    0x3a, 0x1e, 0x00, 0x00, 0x00, 0x00, 0x3a, 0x03
 ])
 const C2S_S2C_PING = Buffer.from([0x3a, 0x19]);
 const name = `<a style="color:red;">:3</a>`
@@ -150,6 +170,10 @@ socket.on('message', function (message, remote) {
         console.log(`-- C2S_MATCH_INFO_REQUEST, sending ${matchInfo.length} bytes back`)
         seqMap["1f" + remote.address] = ((seqMap["1f" + remote.address]) ?? 1) + 1;
         return reply(remote, matchInfo(seqMap["1f" + remote.address]));
+    }
+    if(isMsg(message, C2S_PLAYER_READY)) {
+        console.log(`-- C2S_PLAYER_READY`)
+        return chainReply(remote, [S2C_PLAYER_READY_ACK, matchInfo(seqMap["1f" + remote.address])])
     }
 
 
