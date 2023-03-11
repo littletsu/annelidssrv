@@ -13,7 +13,7 @@ A server can send this packet to broadcast on port 12345 or to other IPs as a re
 [
     // Header
     0x01, 0x15, 0x74, 0x00, 0x01, 0x00,
-    // ?? maybe part of the header
+    // game version?
     0x3a,
     // 32 bytes for the match name, if the match name is shorter, padding with 0x0 has to be done. If more than 32 are given (or the message is longer than 39 bytes) then it will be ignored.
     // "Partida de Crieph"
