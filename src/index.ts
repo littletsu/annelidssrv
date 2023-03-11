@@ -1,0 +1,3 @@
+import Packet from "./protocol/Packet";
+
+console.log(Packet.from(Buffer.from([0x3a, 0x1f, 0x02, 0x00, 0x00, 0x00])))

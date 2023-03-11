@@ -1,5 +1,6 @@
 let pktfile = require('fs').readFileSync('./pkt', 'utf-8')
 let pkt = Buffer.from(pktfile.split('\n').filter(l => l.length >= 2 && l[0] != "#").slice(-1)[0], "hex")
+require('fs').writeFileSync('./pkt.bin', pkt)
 const hex = (name, str) => console.log(`${name} (${str.length} bytes): ${str.toString("hex").match(/.{1,2}/g).join(' ')}`)
 const partstr = (name, part) => console.log(`${name} (${part.s.length} bytes as str): ${part.s.toString().replace(/\0/g, ".")}`)
 let pos = 0;
