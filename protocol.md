@@ -63,6 +63,17 @@ Sent after `"Connection Ack"` from server. Both are variants of `"Match Info Req
 [0x3a, 0x1f, 0x01, 0x00, 0x00, 0x00]
 ```
 
+# Player Info Request (S2C) ?
+Sent after `"Connection Ack/Data Request/Match Info Received"` from client?
+```js
+[
+  // Header?
+  0x3a, 0x1e, 0x01, 0x00, 0x00, 0x00, 0x3a, 0x0a, 
+  // seq?
+  0x0c, 0x00, 0x00, 0x00
+]
+```
+
 # Match Info Request/Match Info Received (C2S) ?
 Asks the server to send a `"Match Info"` packet to the client, or is sent after a `"Match Info"` from server.
 
