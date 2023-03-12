@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnnelidsClient</title>
+    
+</head>
+<body>
+    "<%= connection %>"<br>
+    <textarea disabled rows="25" cols="50" id="logs"></textarea>
+    <script>
+        const logsarea = document.getElementById("logs");
+        const socketProtocol = (window.location.protocol === 'https:' ? 'wss:' : 'ws:')
+        const socketUrl = socketProtocol + '//' + window.location.host + '/logs/'
+        const ws = new WebSocket(socketUrl);
+        const log = (msg) => {
+            logsarea.textContent = logsarea.textContent + msg + "\n" 
+            logsarea.scrollTop = logsarea.scrollHeight
+        }
+        ws.onmessage = ({data}) => {
+            log(data)
+        }
+        ws.onopen = () => {
+            log("Websocket Open")
+        }
+    </script>
+</body>
+</html>
